@@ -1,2 +1,2 @@
 # n8n-submagic
-Automating video editing in Submagic in n8n
+Отдельный воркфлоу для контент-завода, предназначенный для автоматического монатжа AI-видео с помощью API Submagic. 
