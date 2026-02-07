@@ -1,0 +1,212 @@
+{
+  "name": "МОНТАЖ ВИДЕО",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1dx4U3SEO494pioh-aZuZd6thkXk6V2yZ",
+          "mode": "list",
+          "cachedResultName": "ВИДЕО ИСХОДНИКИ НА МОНТАЖ",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1dx4U3SEO494pioh-aZuZd6thkXk6V2yZ"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        96
+      ],
+      "id": "45961c4f-aac5-4ef3-946f-01e752278867",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "tMIvVfSUAWbioBLh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.submagic.co/v1/projects",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"videoUrl\": \"{{ $json.webContentLink }}\",\n    \"language\": \"ru\",\n    \"title\": \"My Video\",\n    \"magicZooms\": true,\n    \"magicBrolls\": true,\n    \"magicBrollsPercentage\": 50,\n    \"webhookUrl\": \"https://n8n-push-t2754445.amvera.io/webhook/606f0034-53b2-496a-ab21-40ee775e6626\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        96
+      ],
+      "id": "75c6639d-a7a3-47e6-a204-89b62fe1980d",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pwAQR0SPlqURXwsj",
+          "name": "Submagic"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "606f0034-53b2-496a-ab21-40ee775e6626",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -128
+      ],
+      "id": "91ad28fb-8eef-4210-8e8a-d5f842e64521",
+      "name": "Webhook",
+      "webhookId": "606f0034-53b2-496a-ab21-40ee775e6626"
+    },
+    {
+      "parameters": {
+        "name": "=[Exported]-{{ $json.body.title }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1aDcINkMFP3dcaFb4e2tfULIhKGXIZZCs",
+          "mode": "list",
+          "cachedResultName": "ВИДЕО СМОНТИРОВАННЫЕ ",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1aDcINkMFP3dcaFb4e2tfULIhKGXIZZCs"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        656,
+        -128
+      ],
+      "id": "fdce6668-6b01-4722-abcf-6d5cc956db0d",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "tMIvVfSUAWbioBLh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.downloadUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        -128
+      ],
+      "id": "932e097c-9752-494e-8384-db3e12a1f3f4",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "=7604387398 ",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        -288
+      ],
+      "id": "2dd50f5e-237e-47c3-863b-ca22bb1fe294",
+      "name": "Send a video1",
+      "webhookId": "8b2a0cd9-6594-4544-8308-4fff017669d4",
+      "credentials": {
+        "telegramApi": {
+          "id": "iVXsUnIYVKpnKKMQ",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "au1WYFQsmA640kbV"
+  },
+  "versionId": "1f6b368f-dc58-4b18-981e-89d827e19fb9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3a0c0af2ed37cd599d6a73fe80407b580a5a35904a20f87f9fa5d6073de8e7a"
+  },
+  "id": "zmhw2sgrOaeQAxVS",
+  "tags": []
+}
